@@ -1,0 +1,194 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Java
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# IDE - Eclipse
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+
+# IDE - VS Code
+.vscode/
+*.code-workspace
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Logs
+logs/
+*.log
+*.log.*
+/var/log/
+
+# Docker
+docker/volumes/
+*.env
+!.env.example
+docker-compose.override.yml
+
+# Security - Keys and Certificates
+*.jks
+*.p12
+*.pem
+*.key
+*.crt
+*.csr
+*.der
+*.p7b
+*.p7c
+*.pfx
+*.cer
+keystore/
+truststore/
+ssl/
+
+# Security - Passwords and Secrets
+**/secrets/
+**/credentials/
+*.password
+*.secret
+.db_password
+.redis_password
+.signing_key
+.encryption_key
+
+# CAS specific
+/etc/cas/logs/
+/etc/cas/services/*.json
+!/etc/cas/services/README.md
+cas.log*
+cas_audit.log*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres-data/
+mysql-data/
+
+# Redis
+dump.rdb
+appendonly.aof
+redis-data/
+
+# LDAP
+ldap-data/
+ldap-config/
+
+# Application specific
+cas-config/
+cas-logs/
+cas-reports/
+cas-services/
+cas-saml/
+nginx-cache/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
+
+# Test data
+test-output/
+test-results/
+coverage/
+.nyc_output/
+
+# Node (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (for scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.tar
+*.zip
+
+# Generated documentation
+/docs/_build/
+/docs/_site/
+.sass-cache/
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+.circleci/
+
+# Local configuration
+local.properties
+local.yml
+local.yaml
+config/local/
+
+# License keys (commercial)
+license.key
+*.lic
+SECURECAS_LICENSE_KEY
+
+# Monitoring
+prometheus-data/
+grafana-data/
+
+# Custom
+.history/
+.cache/
+dist/
+output/
