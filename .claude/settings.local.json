@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Bash(ls:*)",
+      "Bash(mvn:*)",
+      "Bash(java:*)",
+      "Bash(curl:*)",
+      "Bash(tar:*)",
+      "Bash(./apache-maven-3.9.6/bin/mvn -v)",
+      "Bash(cat:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(docker build:*)",
+      "Bash(find:*)",
+      "Bash(docker tag:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git add:*)",
+      "Bash(true)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)"
+    ],
+    "deny": []
+  }
+}
