@@ -1,0 +1,159 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/etc/cas/keystore.jks
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:changeit}
+    key-password: ${SSL_KEY_PASSWORD:changeit}
+  tomcat:
+    mbeanregistry:
+      enabled: true
+    max-http-form-post-size: 20MB
+    max-threads: 200
+    min-spare-threads: 10
+
+cas:
+  server:
+    name: https://${CAS_SERVER_HOST:localhost}:8443
+    prefix: ${cas.server.name}/cas
+  
+  authn:
+    accept:
+      enabled: false
+    ldap:
+      - ldap-url: ${LDAP_URL:ldap://localhost:389}
+        base-dn: ${LDAP_BASE_DN:dc=example,dc=com}
+        bind-dn: ${LDAP_BIND_DN:cn=admin,dc=example,dc=com}
+        bind-credential: ${LDAP_BIND_PASSWORD:password}
+        search-filter: ${LDAP_SEARCH_FILTER:uid={user}}
+        subtree-search: true
+        use-start-tls: false
+        principal-attribute-list: 
+          - cn
+          - mail
+          - displayName
+          - memberOf
+        name: LDAP
+        order: 0
+    
+    mfa:
+      simple:
+        sms:
+          text: "Your CAS verification code is: %s"
+          from: ${SMS_FROM_NUMBER:+1234567890}
+      triggers:
+        global:
+          global-provider-id: mfa-simple
+    
+    oidc:
+      issuer: ${cas.server.prefix}/oidc
+      scopes: openid,profile,email
+      claims: sub,name,family_name,given_name,email,preferred_username
+      dynamic-client-registration:
+        allowed-client-scopes: openid,profile,email
+      discovery:
+        scopes: openid,profile,email
+        claims: sub,name,family_name,given_name,email
+        grant-types-supported: authorization_code,password,client_credentials,refresh_token
+        code-challenge-methods-supported: S256
+  
+  service-registry:
+    jpa:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      driver-class: org.postgresql.Driver
+      url: ${DB_URL:jdbc:postgresql://localhost:5432/cas}
+      user: ${DB_USER:cas}
+      password: ${DB_PASSWORD:password}
+  
+  ticket:
+    registry:
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
+        password: ${REDIS_PASSWORD:}
+        pool:
+          max-active: 20
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1
+  
+  audit:
+    jdbc:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      driver-class: org.postgresql.Driver
+      url: ${DB_URL:jdbc:postgresql://localhost:5432/cas}
+      user: ${DB_USER:cas}
+      password: ${DB_PASSWORD:password}
+      column-length: 4000
+  
+  monitor:
+    endpoints:
+      endpoint:
+        health:
+          enabled: true
+        status:
+          enabled: true
+        metrics:
+          enabled: true
+  
+  sso:
+    allow-missing-service-parameter: true
+    create-sso-cookie-on-renew-authentication: true
+    proxy-authn-enabled: true
+  
+  webflow:
+    crypto:
+      signing:
+        key: ${CAS_WEBFLOW_SIGNING_KEY:}
+      encryption:
+        key: ${CAS_WEBFLOW_ENCRYPTION_KEY:}
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    lazy-initialization: false
+  
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,status,metrics,auditevents
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.apereo.cas: INFO
+    org.springframework: INFO
+    com.securecas: DEBUG
+
+securecas:
+  commercial:
+    enabled: true
+    jit:
+      enabled: true
+      auto-deactivate-enabled: true
+      inactive-days-threshold: 90
+      sync-attributes-on-login: true
+      default-roles:
+        - ROLE_USER
+      attribute-mappings:
+        username: uid
+        email: mail
+        first-name: givenName
+        last-name: sn
+        display-name: displayName
+        phone-number: telephoneNumber
+        department: department
+        employee-id: employeeNumber
+        groups: memberOf

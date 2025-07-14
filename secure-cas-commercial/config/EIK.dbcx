@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DatabaseConnection>
+    <!-- EIK Database Connection Configuration -->
+    <!-- This file should be mounted from /opt/secure-cas/config/EIK.dbcx -->
+    
+    <ConnectionPool name="EIKPool">
+        <Driver>oracle.jdbc.driver.OracleDriver</Driver>
+        <URL>jdbc:oracle:thin:@//oracle-host:1521/EBSDB</URL>
+        <Username>EBS_USER</Username>
+        <Password>ENCRYPTED_PASSWORD_HERE</Password>
+        
+        <!-- Connection Pool Settings -->
+        <InitialSize>5</InitialSize>
+        <MaxTotal>50</MaxTotal>
+        <MaxIdle>10</MaxIdle>
+        <MinIdle>5</MinIdle>
+        <MaxWaitMillis>30000</MaxWaitMillis>
+        
+        <!-- Validation Settings -->
+        <ValidationQuery>SELECT 1 FROM DUAL</ValidationQuery>
+        <TestOnBorrow>true</TestOnBorrow>
+        <TestWhileIdle>true</TestWhileIdle>
+        <TimeBetweenEvictionRunsMillis>60000</TimeBetweenEvictionRunsMillis>
+        
+        <!-- Oracle Specific Settings -->
+        <ConnectionProperties>
+            <Property name="oracle.net.CONNECT_TIMEOUT">10000</Property>
+            <Property name="oracle.net.READ_TIMEOUT">30000</Property>
+            <Property name="oracle.jdbc.ReadTimeout">30000</Property>
+        </ConnectionProperties>
+    </ConnectionPool>
+    
+    <!-- EBS Application Context -->
+    <ApplicationContext>
+        <Property name="APPS_JDBC_URL">jdbc:oracle:thin:@//oracle-host:1521/EBSDB</Property>
+        <Property name="GWYUID">APPLSYSPUB/PUB</Property>
+        <Property name="FND_JDBC_USABLE_CHECK">false</Property>
+        <Property name="GUEST_USER_PWD">GUEST/ORACLE</Property>
+    </ApplicationContext>
+    
+    <!-- Security Settings -->
+    <Security>
+        <EncryptionAlgorithm>AES256</EncryptionAlgorithm>
+        <KeyStore>/opt/secure-cas/config/keystore.jks</KeyStore>
+        <KeyStorePassword>ENCRYPTED_KEYSTORE_PASSWORD</KeyStorePassword>
+    </Security>
+</DatabaseConnection>
