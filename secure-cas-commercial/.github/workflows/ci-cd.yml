@@ -60,18 +60,9 @@ jobs:
         REDIS_HOST: localhost
         REDIS_PORT: 6379
     
-    - name: Check for test reports
-      id: check-reports
-      run: |
-        if find . -path '**/surefire-reports/*.xml' -type f | grep -q .; then
-          echo "found=true" >> $GITHUB_OUTPUT
-        else
-          echo "found=false" >> $GITHUB_OUTPUT
-        fi
-    
     - name: Generate test report
       uses: dorny/test-reporter@v1
-      if: (success() || failure()) && steps.check-reports.outputs.found == 'true'
+      if: success() || failure()
       with:
         name: Maven Tests
         path: '**/surefire-reports/*.xml'
@@ -79,16 +70,13 @@ jobs:
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
-      if: always()
       with:
         file: ./target/site/jacoco/jacoco.xml
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: false
 
   build:
     needs: test
-    if: always()
     runs-on: ubuntu-latest
     
     steps:
@@ -115,7 +103,6 @@ jobs:
 
   security-scan:
     needs: build
-    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     
     steps:
@@ -146,7 +133,7 @@ jobs:
   docker:
     needs: [build, security-scan]
     runs-on: ubuntu-latest
-    if: always() && github.event_name != 'pull_request' && needs.build.result == 'success'
+    if: github.event_name != 'pull_request'
     
     permissions:
       contents: read

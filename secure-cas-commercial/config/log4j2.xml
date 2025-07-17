@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ISO8601} %highlight{%-5level} [%t] %logger{36} - %msg%n"/>
+        </Console>
+        
+        <RollingFile name="RollingFile" fileName="/var/log/cas/cas.log"
+                     filePattern="/var/log/cas/cas-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{ISO8601} %-5level [%t] %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+        
+        <RollingFile name="AuditFile" fileName="/var/log/cas/cas-audit.log"
+                     filePattern="/var/log/cas/cas-audit-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{ISO8601} %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="90"/>
+        </RollingFile>
+    </Appenders>
+    
+    <Loggers>
+        <Logger name="org.apereo.cas" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+        
+        <Logger name="org.apereo.inspektr.audit" level="INFO" additivity="false">
+            <AppenderRef ref="AuditFile"/>
+        </Logger>
+        
+        <Logger name="com.securecas.commercial" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Logger>
+        
+        <Logger name="org.springframework" level="WARN"/>
+        <Logger name="org.springframework.boot" level="INFO"/>
+        <Logger name="org.springframework.security" level="INFO"/>
+        
+        <Root level="WARN">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  cas:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: securecas/commercial:latest
+    container_name: securecas
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+    environment:
+      - CAS_SERVER_HOST=${CAS_SERVER_HOST:-localhost}
+      - DB_URL=jdbc:postgresql://postgres:5432/cas
+      - DB_USER=cas
+      - DB_PASSWORD=${DB_PASSWORD:-SecureP@ssw0rd}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - LDAP_URL=ldap://ldap:389
+      - LDAP_BASE_DN=${LDAP_BASE_DN:-dc=example,dc=com}
+      - LDAP_BIND_DN=${LDAP_BIND_DN:-cn=admin,dc=example,dc=com}
+      - LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-admin}
+      - SSL_KEYSTORE_PASSWORD=${SSL_KEYSTORE_PASSWORD:-changeit}
+      - CAS_WEBFLOW_SIGNING_KEY=${CAS_WEBFLOW_SIGNING_KEY}
+      - CAS_WEBFLOW_ENCRYPTION_KEY=${CAS_WEBFLOW_ENCRYPTION_KEY}
+    volumes:
+      - cas-config:/etc/cas/config
+      - cas-logs:/var/log/cas
+      - cas-reports:/var/cas/reports
+      - cas-services:/etc/cas/services
+      - cas-saml:/etc/cas/saml
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - cas-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: cas-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=cas
+      - POSTGRES_USER=cas
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-SecureP@ssw0rd}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - cas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cas"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cas-redis
+    restart: unless-stopped
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    networks:
+      - cas-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: cas-ldap
+    restart: unless-stopped
+    environment:
+      - LDAP_ORGANISATION=${LDAP_ORGANISATION:-Example Inc}
+      - LDAP_DOMAIN=${LDAP_DOMAIN:-example.com}
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
+      - LDAP_CONFIG_PASSWORD=${LDAP_CONFIG_PASSWORD:-config}
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=readonly
+    volumes:
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
+    networks:
+      - cas-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: cas-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - cas
+    networks:
+      - cas-network
+
+volumes:
+  cas-config:
+  cas-logs:
+  cas-reports:
+  cas-services:
+  cas-saml:
+  postgres-data:
+  redis-data:
+  ldap-data:
+  ldap-config:
+  nginx-cache:
+
+networks:
+  cas-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
